@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&display=swap" rel="stylesheet">
+
+<title>こっきクイズ</title>
+
+<style>
+
+body{
+margin:0;
+font-family:"Kiwi Maru",sans-serif;
+text-align:center;
+background-color:#fff9f2;
+
+background-image:
+radial-gradient(#bfe9ff 25%, transparent 26%),
+radial-gradient(#bfe9ff 25%, transparent 26%);
+
+background-size:120px 120px;
+background-position:0 0,60px 60px;
+}
+
+.screen{
+display:none;
+padding:20px;
+}
+
+.show{
+display:block;
+}
+
+/* ⭐ ガーランド */
+
+.garland{
+display:flex;
+justify-content:center;
+gap:10px;
+margin-top:30px;
+flex-wrap:wrap;
+}
+
+.garland img{
+width:55px;
+border-radius:6px;
+box-shadow:0 4px 0 rgba(0,0,0,0.15);
+}
+
+/* 手書きっぽく少し回転 */
+
+.garland img:nth-child(odd){
+transform:rotate(-6deg);
+}
+
+.garland img:nth-child(even){
+transform:rotate(6deg);
+}
+
+h1{
+font-size:60px;
+margin-top:40px;
+}
+
+#startButton{
+
+font-family:"Kiwi Maru",sans-serif;
+font-size:52px;
+
+background:#ffb6d9;
+color:white;
+
+border:none;
+border-radius:25px;
+
+padding:35px 100px;
+
+box-shadow:0 6px 0 #ff8cc3;
+
+cursor:pointer;
+}
+
+#startButton:active{
+transform:translateY(4px);
+box-shadow:0 2px 0 #ff8cc3;
+}
+
+#questionNumber{
+font-size:28px;
+margin-bottom:20px;
+}
+
+#questionText{
+font-size:40px;
+margin-bottom:20px;
+}
+
+#flag{
+width:70%;
+max-width:420px;
+margin:30px 0;
+border-radius:15px;
+}
+
+.buttonRow{
+display:flex;
+justify-content:center;
+gap:20px;
+margin-top:30px;
+}
+
+.answerButton{
+
+font-family:"Kiwi Maru",sans-serif;
+font-size:32px;
+
+padding:25px 40px;
+
+border:none;
+border-radius:20px;
+
+background:#ffd86b;
+
+cursor:pointer;
+}
+
+#resultStars{
+font-size:60px;
+margin-top:40px;
+}
+
+#comment{
+font-size:36px;
+margin-top:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- スタート画面 -->
+
+<div id="start" class="screen show">
+
+<div class="garland">
+
+<img src="https://flagcdn.com/w80/jp.png">
+<img src="https://flagcdn.com/w80/us.png">
+<img src="https://flagcdn.com/w80/fr.png">
+<img src="https://flagcdn.com/w80/br.png">
+<img src="https://flagcdn.com/w80/kr.png">
+<img src="https://flagcdn.com/w80/gb.png">
+<img src="https://flagcdn.com/w80/de.png">
+<img src="https://flagcdn.com/w80/it.png">
+
+</div>
+
+<h1>こっきクイズ</h1>
+
+<button id="startButton">スタート</button>
+
+</div>
+
+<!-- クイズ画面 -->
+
+<div id="quiz" class="screen">
+
+<div id="questionNumber"></div>
+
+<div id="questionText">これはなに？</div>
+
+<img id="flag">
+
+<div class="buttonRow">
+
+<button class="answerButton" id="correct">できた ⭐</button>
+
+<button class="answerButton" id="retry">もういっかい 🔁</button>
+
+</div>
+
+</div>
+
+<!-- 結果画面 -->
+
+<div id="result" class="screen">
+
+<div id="resultStars"></div>
+
+<div id="comment"></div>
+
+</div>
+
+<script>
+
+const flags=[
+
+"jp","us","ca","mx","br","ar","cl","pe","co","cu",
+"gb","fr","de","it","es","pt","nl","be","ch","se",
+"no","fi","dk","pl","gr",
+"cn","kr","in","th","vn","id","ph","my","sg","mn",
+"tr","sa","ae","eg","ke","za",
+"au","nz","fj"
+
+]
+
+let quiz=[]
+let index=0
+let score=0
+
+const start=document.getElementById("start")
+const quizScreen=document.getElementById("quiz")
+const result=document.getElementById("result")
+
+const flag=document.getElementById("flag")
+
+document.getElementById("startButton").onclick=()=>{
+
+quiz=[...flags].sort(()=>Math.random()-0.5).slice(0,10)
+
+index=0
+score=0
+
+start.classList.remove("show")
+quizScreen.classList.add("show")
+
+showQuestion()
+
+}
+
+function showQuestion(){
+
+document.getElementById("questionNumber").textContent=
+(index+1)+" / 10"
+
+flag.src="https://flagcdn.com/w640/"+quiz[index]+".png"
+
+}
+
+document.getElementById("correct").onclick=()=>{
+
+score++
+
+playSound()
+
+next()
+
+}
+
+document.getElementById("retry").onclick=()=>{
+
+next()
+
+}
+
+function next(){
+
+index++
+
+if(index>=10){
+
+showResult()
+
+}else{
+
+showQuestion()
+
+}
+
+}
+
+function showResult(){
+
+quizScreen.classList.remove("show")
+result.classList.add("show")
+
+let stars="⭐".repeat(score)
+
+document.getElementById("resultStars").textContent=stars
+
+let comment=""
+
+if(score<=3) comment="またやってみよう！"
+else if(score<=6) comment="がんばったね！"
+else if(score<=9) comment="すごい！こっきはかせ！"
+else comment="やったー！だいせいこう！"
+
+document.getElementById("comment").textContent=comment
+
+}
+
+result.onclick=()=>{
+
+result.classList.remove("show")
+start.classList.add("show")
+
+}
+
+function playSound(){
+
+const audio=new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg")
+
+audio.play()
+
+}
+
+</script>
+
+</body>
+</html>
